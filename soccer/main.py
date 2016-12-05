@@ -5,13 +5,16 @@ import sys
 import json
 
 from soccer import leagueids
+from soccer import leaguenames
 from soccer.exceptions import IncorrectParametersException, APIErrorException
 from soccer.writers import get_writer
 
 
 BASE_URL = 'http://api.football-data.org/alpha/'
 LIVE_URL = 'http://soccer-cli.appspot.com/'
+LIVE_LEAGUES_URL = 'http://soccer-cli.appspot.com/'
 LEAGUE_IDS = leagueids.LEAGUE_IDS
+LEAGUE_NAMES = leaguenames.LEAGUE_NAMES
 
 
 def load_json(file):
@@ -103,6 +106,24 @@ def get_live_scores(writer, use_12_hour_format):
             click.secho("No live action currently", fg="red", bold=True)
             return
         writer.live_scores(scores, use_12_hour_format)
+    else:
+        click.secho("There was problem getting live scores", fg="red", bold=True)
+        
+        
+def get_live_league(writer, use_12_hour_format, league):
+    """Gets the live scores for a league"""
+    req = requests.get(LIVE_LEAGUES_URL)
+    if req.status_code == requests.codes.ok:
+        scores = req.json()
+        if len(scores["games"]) == 0:
+            click.secho("No live action currently", fg="red", bold=True)
+            return
+        filtered_scores = {}
+        filtered_scores["games"] = [game for game in scores["games"] if game['league'] == LEAGUE_NAMES[league]]
+        if len(filtered_scores["games"]) == 0:
+            click.secho("No live action currently for {league}.".format(league=league), fg="red", bold=True)
+            return
+        writer.live_scores(filtered_scores, use_12_hour_format)
     else:
         click.secho("There was problem getting live scores", fg="red", bold=True)
 
@@ -286,7 +307,10 @@ def main(league, time, standings, team, live, use12hour, players, output_format,
             return
 
         if live:
-            get_live_scores(writer, use12hour)
+            if not league:
+                get_live_scores(writer, use12hour)
+                return
+            get_live_league(writer, use12hour, league)
             return
 
         if standings:
