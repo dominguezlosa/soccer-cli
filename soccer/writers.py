@@ -119,8 +119,8 @@ class Stdout(BaseWriter):
 
     def standings(self, league_table, league):
         """ Prints the league standings in a pretty way """
-        click.secho("%-6s  %-30s    %-10s    %-10s    %-10s" %
-                    ("POS", "CLUB", "PLAYED", "GOAL DIFF", "POINTS"))
+        click.secho("%-6s  %-30s    %-8s    %-8s    %-8s    %-9s    %-10s    %-10s" %
+                    ("POS", "CLUB", "PLAYED", "WINS", "DRAWS", "LOSSES", "GOAL DIFF", "POINTS"))
         positionlist = [team["position"] for team in league_table["standing"]]
         for team in league_table["standing"]:
             if team["goalDifference"] >= 0:
@@ -134,7 +134,9 @@ class Stdout(BaseWriter):
             rl_upper, rl_lower = LEAGUE_PROPERTIES[league]['rl']
 
             team_str = (u"{position:<7} {teamName:<33} {playedGames:<12}"
+                        u"{wins:<11} {draws:<11} {losses:<11}"
                         u" {goalDifference:<14} {points}").format(**team)
+                        
             if cl_upper <= team["position"] <= cl_lower:
                 click.secho(team_str, bold=True, fg=self.colors.CL_POSITION)
             elif el_upper <= team["position"] <= el_lower:

@@ -10,7 +10,7 @@
 -- En --standings separar goles en marcados y recibidos
 -- time=n personalizar error
 -- Crear comando --leagues para devolver todas las ligas disponibles junto con su código
-
+-- Filtrar por jornadas
 
 Cómo refrescar el texto de consola:
 http://stackoverflow.com/questions/2122385/dynamic-terminal-printing-with-python
