@@ -117,10 +117,14 @@ class Stdout(BaseWriter):
             click.echo()
             click.secho(fmt.format(**player), bold=True)
 
-    def standings(self, league_table, league):
+    def standings_extended(self, league_table, league):
         """ Prints the league standings in a pretty way """
+        """
         click.secho("%-6s  %-30s    %-8s    %-8s    %-8s    %-9s    %-10s    %-10s" %
-                    ("POS", "CLUB", "PLAYED", "WINS", "DRAWS", "LOSSES", "GOAL DIFF", "POINTS"))
+                    ("POS", "CLUB", "PLAYED", "WINS", "DRAWS", "LOSSES", 
+                    "GOAL DIFF", "POINTS", "HOME - GOALS", "HOME - GOALS AGAINST", 
+                    "HOME - WINS", "HOME - DRAWS", "HOME - LOSSES"))
+        """
         positionlist = [team["position"] for team in league_table["standing"]]
         for team in league_table["standing"]:
             if team["goalDifference"] >= 0:
@@ -136,6 +140,37 @@ class Stdout(BaseWriter):
             team_str = (u"{position:<7} {teamName:<33} {playedGames:<12}"
                         u"{wins:<11} {draws:<11} {losses:<11}"
                         u" {goalDifference:<14} {points}").format(**team)
+                        
+            #team_str.append(())
+            
+            if cl_upper <= team["position"] <= cl_lower:
+                click.secho(team_str, bold=True, fg=self.colors.CL_POSITION)
+            elif el_upper <= team["position"] <= el_lower:
+                click.secho(team_str, fg=self.colors.EL_POSITION)
+            elif rl_upper <= team["position"] <= rl_lower:
+                click.secho(team_str, fg=self.colors.RL_POSITION)
+            else:
+                click.secho(team_str, fg=self.colors.POSITION)
+
+    def standings(self, league_table, league):
+        """ Prints the league standings in a pretty way """
+        click.secho("%-6s  %-30s    %-7s    %-5s    %-5s    %-6s    %-7s    %-7s    %-9s    %-9s" %
+                    ("POS", "CLUB", "PLAYED", "WINS", "DRAWS", "LOSSES", "GOALS FOR", "GOALS AGAINST", "GOAL DIFF", "POINTS"))
+        positionlist = [team["position"] for team in league_table["standing"]]
+        for team in league_table["standing"]:
+            if team["goalDifference"] >= 0:
+                team["goalDifference"] = ' ' + str(team["goalDifference"])
+
+            # Define the upper and lower bounds for Champions League,
+            # Europa League and Relegation places.
+            # This is so we can highlight them appropriately.
+            cl_upper, cl_lower = LEAGUE_PROPERTIES[league]['cl']
+            el_upper, el_lower = LEAGUE_PROPERTIES[league]['el']
+            rl_upper, rl_lower = LEAGUE_PROPERTIES[league]['rl']
+
+            team_str = (u"{position:<7} {teamName:<33} {playedGames:<11}"
+                        u"{wins:<8} {draws:<8} {losses:<9} {goals:<12} {goalsAgainst:<15}"
+                        u" {goalDifference:<13} {points}").format(**team)
                         
             if cl_upper <= team["position"] <= cl_lower:
                 click.secho(team_str, bold=True, fg=self.colors.CL_POSITION)

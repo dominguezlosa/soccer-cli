@@ -162,13 +162,16 @@ def get_team_scores(team, time, writer, show_upcoming, use_12_hour_format):
                     fg="red", bold=True)
 
 
-def get_standings(league, writer):
+def get_standings(league, writer, extended):
     """Queries the API and gets the standings for a particular league"""
     league_id = LEAGUE_IDS[league]
     try:
         req = _get('soccerseasons/{id}/leagueTable'.format(
                     id=league_id))
-        writer.standings(req.json(), league)
+        if extended:
+            writer.standings_extended(req.json(), league)
+        else:
+            writer.standings(req.json(), league)
     except APIErrorException:
         # Click handles incorrect League codes so this will only come up
         # if that league does not have standings available. ie. Champions League
@@ -263,6 +266,8 @@ def list_team_codes():
               help="Displays the time using 12 hour format instead of 24 (default).")
 @click.option('--standings', is_flag=True,
               help="Standings for a particular league.")
+@click.option('--extended', is_flag=True, default=False,
+              help="Displays extra info when used with --standings command.")
 @click.option('--league', '-league', type=click.Choice(LEAGUE_IDS.keys()),
               help=("Select fixtures from a particular league."))
 @click.option('--players', is_flag=True,
@@ -283,7 +288,7 @@ def list_team_codes():
               help='Output in JSON format.')
 @click.option('-o', '--output-file', default=None,
               help="Save output to a file (only if csv or json option is provided).")
-def main(league, time, standings, team, live, use12hour, players, output_format,
+def main(league, time, standings, extended, team, live, use12hour, players, output_format,
          output_file, upcoming, lookup, listcodes, apikey):
     """
     A CLI for live and past football scores from various football leagues.
@@ -329,7 +334,7 @@ def main(league, time, standings, team, live, use12hour, players, output_format,
             if not league:
                 raise IncorrectParametersException('Please specify a league. '
                                                    'Example --standings --league=EPL')
-            get_standings(league, writer)
+            get_standings(league, writer, extended)
             return
 
         if team:
