@@ -8,7 +8,8 @@
     -- expulsados
     -- numero de tarjetas
 -- En --standings separar goles en marcados y recibidos
--- time=n personalizar
+-- time=n personalizar error
+-- Crear comando --leagues para devolver todas las ligas disponibles junto con su código
 
 
 Cómo refrescar el texto de consola:

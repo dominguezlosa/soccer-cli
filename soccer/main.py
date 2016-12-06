@@ -108,7 +108,8 @@ def get_live_scores(writer, use_12_hour_format):
             click.secho("No live action currently", fg="red", bold=True)
             return
         for game in scores["games"]:
-            game['league'] = LEAGUE_KEYS[game['league']]
+            if game['league'] in LEAGUE_KEYS: #evitar que pete si la key no existe
+                game['league'] = LEAGUE_KEYS[game['league']]
         writer.live_scores(scores, use_12_hour_format)
     else:
         click.secho("There was problem getting live scores", fg="red", bold=True)

@@ -11,5 +11,5 @@ LEAGUE_KEYS = {
     "Italian Serie A": "SA",
     "Portuguese Liga": "PPL",
     #"0": "DED",
-    #"0": "CL"
+    "UEFA Champions League": "CL"
 }

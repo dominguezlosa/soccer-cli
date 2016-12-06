@@ -11,5 +11,5 @@ LEAGUE_NAMES = {
     "SA": "Italian Serie A",
     "PPL": "Portuguese Liga",
     "DED": 0,
-    "CL": 0
+    "CL": "UEFA Champions League"
 }
