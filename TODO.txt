@@ -11,6 +11,7 @@
 -- time=n personalizar error
 -- Crear comando --leagues para devolver todas las ligas disponibles junto con su código
 -- Filtrar por jornadas
+-- Probar a añadir --help a cada commando para ser mostrado
 
 Cómo refrescar el texto de consola:
 http://stackoverflow.com/questions/2122385/dynamic-terminal-printing-with-python

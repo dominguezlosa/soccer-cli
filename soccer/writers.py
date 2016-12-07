@@ -48,7 +48,7 @@ class BaseWriter(object):
     def supported_leagues(self, total_data):
         """Filters out scores of unsupported leagues"""
         supported_leagues = {val: key for key, val in LEAGUE_IDS.items()}
-        get_league_id = lambda x: int(x["_links"]["soccerseason"]["href"].split("/")[-1])
+        get_league_id = lambda x: int(x["_links"]["competition"]["href"].split("/")[-1])
         fixtures = (fixture for fixture in total_data["fixtures"]
                     if get_league_id(fixture) in supported_leagues)
 
@@ -119,12 +119,14 @@ class Stdout(BaseWriter):
 
     def standings_extended(self, league_table, league):
         """ Prints the league standings in a pretty way """
-        """
-        click.secho("%-6s  %-30s    %-8s    %-8s    %-8s    %-9s    %-10s    %-10s" %
-                    ("POS", "CLUB", "PLAYED", "WINS", "DRAWS", "LOSSES", 
-                    "GOAL DIFF", "POINTS", "HOME - GOALS", "HOME - GOALS AGAINST", 
-                    "HOME - WINS", "HOME - DRAWS", "HOME - LOSSES"))
-        """
+        click.secho("%-6s  %-30s    %-7s    %-5s    %-5s    %-6s    %-4s    %-4s    "
+                    "%-5s  %-5s    %-4s    %-4s    %-4s   %-3s     %-3s    %-4s    "
+                    "%-4s    %-3s    %-4s    %-3s" %
+                    ("POS", "CLUB", "PLAYED", "WINS", "DRAWS", "LOSSES", "GF",
+                    "GA", "GD", "POINTS", "HGF",
+                    "HGA", "HW", "HD", "HL",
+                    "AGF", "AGA", "AW",
+                    "AD", "AL"))
         positionlist = [team["position"] for team in league_table["standing"]]
         for team in league_table["standing"]:
             if team["goalDifference"] >= 0:
@@ -137,12 +139,16 @@ class Stdout(BaseWriter):
             el_upper, el_lower = LEAGUE_PROPERTIES[league]['el']
             rl_upper, rl_lower = LEAGUE_PROPERTIES[league]['rl']
 
-            team_str = (u"{position:<7} {teamName:<33} {playedGames:<12}"
-                        u"{wins:<11} {draws:<11} {losses:<11}"
-                        u" {goalDifference:<14} {points}").format(**team)
-                        
-            #team_str.append(())
-            
+            team_str = (u"{position:<7} {teamName:<33} {playedGames:<11}"
+                        u"{wins:<8} {draws:<8} {losses:<9} {goals:<7} {goalsAgainst:<6}"
+                        u" {goalDifference:<7} {points:<10}").format(**team)
+
+            team_str += ((u"{goals:<7} {goalsAgainst:<7} {wins:<7}"
+                            u"{draws:<7} {losses:<7}").format(**team["home"]))
+                            
+            team_str += ((u"{goals:<7} {goalsAgainst:<7} {wins:<7}"
+                            u"{draws:<7} {losses:<7}").format(**team["away"]))
+                            
             if cl_upper <= team["position"] <= cl_lower:
                 click.secho(team_str, bold=True, fg=self.colors.CL_POSITION)
             elif el_upper <= team["position"] <= el_lower:
@@ -155,7 +161,8 @@ class Stdout(BaseWriter):
     def standings(self, league_table, league):
         """ Prints the league standings in a pretty way """
         click.secho("%-6s  %-30s    %-7s    %-5s    %-5s    %-6s    %-7s    %-7s    %-9s    %-9s" %
-                    ("POS", "CLUB", "PLAYED", "WINS", "DRAWS", "LOSSES", "GOALS FOR", "GOALS AGAINST", "GOAL DIFF", "POINTS"))
+                    ("POS", "CLUB", "PLAYED", "WINS", "DRAWS", "LOSSES", "GOALS FOR",
+                    "GOALS AGAINST", "GOAL DIFF", "POINTS"))
         positionlist = [team["position"] for team in league_table["standing"]]
         for team in league_table["standing"]:
             if team["goalDifference"] >= 0:

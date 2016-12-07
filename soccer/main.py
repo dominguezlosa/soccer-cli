@@ -11,7 +11,7 @@ from soccer.exceptions import IncorrectParametersException, APIErrorException
 from soccer.writers import get_writer
 
 
-BASE_URL = 'http://api.football-data.org/alpha/'
+BASE_URL = 'http://api.football-data.org/v1/'
 LIVE_URL = 'http://soccer-cli.appspot.com/'
 LIVE_LEAGUES_URL = 'http://soccer-cli.appspot.com/'
 LEAGUE_IDS = leagueids.LEAGUE_IDS
@@ -161,12 +161,37 @@ def get_team_scores(team, time, writer, show_upcoming, use_12_hour_format):
         click.secho("Team code is not correct.",
                     fg="red", bold=True)
 
+def get_matchday_standings(league, writer, extended, matchday):
+    """Queries the API and gets the standings for a particular matchday for a league"""
+    league_id = LEAGUE_IDS[league]
+    try:
+        req = _get('competitions/{id}'.format(
+                    id=league_id))
+        competition = req.json()
+        if competition["currentMatchday"] < matchday:
+            click.secho("The current matchday for this league is {matchday}, "
+                        "introduce a value that is less than or equal to it.".format(matchday=competition["currentMatchday"]),
+                    fg="red", bold=True)
+            return
+        
+        req = _get('competitions/{id}/leagueTable/?matchday={matchday}'.format(
+                    id=league_id, matchday=matchday))
+        if extended:
+            writer.standings_extended(req.json(), league)
+        else:
+            writer.standings(req.json(), league)
+    except APIErrorException:
+        # Click handles incorrect League codes so this will only come up
+        # if that league does not have standings available. ie. Champions League
+        click.secho("No standings availble for {league}.".format(league=league),
+                    fg="red", bold=True)
+
 
 def get_standings(league, writer, extended):
     """Queries the API and gets the standings for a particular league"""
     league_id = LEAGUE_IDS[league]
     try:
-        req = _get('soccerseasons/{id}/leagueTable'.format(
+        req = _get('competitions/{id}/leagueTable'.format(
                     id=league_id))
         if extended:
             writer.standings_extended(req.json(), league)
@@ -180,7 +205,6 @@ def get_standings(league, writer, extended):
 
 
 def get_league_scores(league, time, writer, show_upcoming, use_12_hour_format):
-
     """
     Queries the API and fetches the scores for fixtures
     based upon the league and time parameter
@@ -189,7 +213,7 @@ def get_league_scores(league, time, writer, show_upcoming, use_12_hour_format):
     if league:
         try:
             league_id = LEAGUE_IDS[league]
-            req = _get('soccerseasons/{id}/fixtures?timeFrame={time_frame}{time}'.format(
+            req = _get('competitions/{id}/fixtures?timeFrame={time_frame}{time}'.format(
                  id=league_id, time_frame=time_frame, time=str(time)))
             fixtures_results = req.json()
             # no fixtures in the past week. display a help message and return
@@ -267,7 +291,21 @@ def list_team_codes():
 @click.option('--standings', is_flag=True,
               help="Standings for a particular league.")
 @click.option('--extended', is_flag=True, default=False,
-              help="Displays extra info when used with --standings command.")
+              help="Displays extra info when used with --standings command."
+              "GA = Goals against."
+              "GF = Goals for."
+              "GD = Goals difference."
+              "HGF = Home Goals For."
+              "HW = Home Wins."
+              "HD = Home Draws."
+              "HL = Home Losses."
+              "AGF = Away Goals Difference."
+              "AGA = Away Goals Away."
+              "AW = Away Wins."
+              "AD = Away Draws."
+              "AL = Away Losses.")
+@click.option('--matchday', default=-1,
+              help="The matchday of the league for which you want to see the standings.")              
 @click.option('--league', '-league', type=click.Choice(LEAGUE_IDS.keys()),
               help=("Select fixtures from a particular league."))
 @click.option('--players', is_flag=True,
@@ -288,7 +326,7 @@ def list_team_codes():
               help='Output in JSON format.')
 @click.option('-o', '--output-file', default=None,
               help="Save output to a file (only if csv or json option is provided).")
-def main(league, time, standings, extended, team, live, use12hour, players, output_format,
+def main(league, time, standings, extended, matchday, team, live, use12hour, players, output_format,
          output_file, upcoming, lookup, listcodes, apikey):
     """
     A CLI for live and past football scores from various football leagues.
@@ -334,7 +372,10 @@ def main(league, time, standings, extended, team, live, use12hour, players, outp
             if not league:
                 raise IncorrectParametersException('Please specify a league. '
                                                    'Example --standings --league=EPL')
-            get_standings(league, writer, extended)
+            if matchday > 0:
+                get_matchday_standings(league, writer, extended, matchday)
+            else:    
+                get_standings(league, writer, extended)
             return
 
         if team:
