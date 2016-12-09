@@ -1,7 +1,7 @@
 LEAGUE_NAMES = {
-    "BL": 0,
+    "BL": "German Bundesliga",
     "BL2": 0,
-    "FL": 0 ,
+    "FL": "French Ligue 1",
     "FL2": 0,
     "EPL": "Premier League",
     "EL1": 0,
@@ -10,6 +10,6 @@ LEAGUE_NAMES = {
     "SD": 0,
     "SA": "Italian Serie A",
     "PPL": "Portuguese Liga",
-    "DED": 0,
+    "DED": "Dutch Eredivisie",
     "CL": "UEFA Champions League"
 }

@@ -1,7 +1,7 @@
 LEAGUE_KEYS = {
-    #"0": "BL",
+    "German Bundesliga": "BL",
     #"0": "BL2",
-    #"0": "FL",
+    "French Ligue 1": "FL",
     #"0": "FL2",
     "Premier League": "EPL",
     #"0": "EL1",
@@ -10,6 +10,6 @@ LEAGUE_KEYS = {
     #"0": "SD",
     "Italian Serie A": "SA",
     "Portuguese Liga": "PPL",
-    #"0": "DED",
+    "Dutch Eredivisie": "DED",
     "UEFA Champions League": "CL"
 }
