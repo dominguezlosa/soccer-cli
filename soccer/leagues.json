@@ -1,0 +1,70 @@
+{  
+  "leagues":[  
+    {
+        "id":405,
+        "name":"Champions League",
+        "code":"CL"
+    },
+    {
+        "id":426,
+        "name":"Premier League",
+        "code":"EPL"
+    },
+    {
+        "id":428,
+        "name":"League One",
+        "code":"EL1"
+    },
+    {
+        "id":434,
+        "name":"Ligue 1",
+        "code":"FL"
+    },
+    {
+        "id":435,
+        "name":"Ligue 2",
+        "code":"FL2"
+    },
+    {
+        "id":430,
+        "name":"Bundesliga",
+        "code":"BL"
+    },
+    {
+        "id":431,
+        "name":"2. Bundesliga",
+        "code":"BL2"
+    },
+    {
+        "id":403,
+        "name":"3. Liga",
+        "code":"BL3",
+        "old":"yes"
+    },
+    {
+        "id":438,
+        "name":"Serie A",
+        "code":"SA"
+    },
+    {
+        "id":433,
+        "name":"Eredivisie",
+        "code":"DED"
+    },
+    {
+        "id":439,
+        "name":"Primeira Liga",
+        "code":"PPL"
+    },
+    {
+        "id":436,
+        "name":"La Liga",
+        "code":"LLIGA"
+    },
+    {
+        "id":437,
+        "name":"Segunda Division",
+        "code":"SD"
+    }
+  ]
+}

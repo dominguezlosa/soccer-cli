@@ -5,7 +5,7 @@ import sys
 import json
 
 from soccer import leagueids
-from soccer import leaguenames
+from soccer import leaguenameslive
 from soccer import leaguekeys
 from soccer.exceptions import IncorrectParametersException, APIErrorException
 from soccer.writers import get_writer
@@ -15,7 +15,7 @@ BASE_URL = 'http://api.football-data.org/v1/'
 LIVE_URL = 'http://soccer-cli.appspot.com/'
 LIVE_LEAGUES_URL = 'http://soccer-cli.appspot.com/'
 LEAGUE_IDS = leagueids.LEAGUE_IDS
-LEAGUE_NAMES = leaguenames.LEAGUE_NAMES
+LEAGUE_NAMES = leaguenameslive.LEAGUE_NAMES
 LEAGUE_KEYS = leaguekeys.LEAGUE_KEYS
 
 
@@ -29,6 +29,7 @@ def load_json(file):
 
 TEAM_DATA = load_json("teams.json")["teams"]
 TEAM_NAMES = {team["code"]: team["id"] for team in TEAM_DATA}
+LEAGUE_DATA = load_json("leagues.json")["leagues"]
 
 
 def get_input_key():
@@ -277,6 +278,11 @@ def list_team_codes():
             if team["code"] != "null":
                 click.secho(u"{0}: {1}".format(team["code"], team["name"]), fg="yellow")
         click.secho("")
+        
+def list_league_codes():
+    """List supported league names."""
+    for league in LEAGUE_DATA:
+        click.secho(u"{0}: {1}".format(league["code"], league["name"]), fg="yellow")
 
 
 @click.command()
@@ -284,6 +290,8 @@ def list_team_codes():
               help="API key to use.")
 @click.option('--list', 'listcodes', is_flag=True,
               help="List all valid team code/team name pairs.")
+@click.option('--leagues', 'listleagues', is_flag=True,
+              help="Shows all the supported leagues.")
 @click.option('--live', is_flag=True,
               help="Shows live scores from various leagues.")
 @click.option('--use12hour', is_flag=True, default=False,
@@ -327,7 +335,7 @@ def list_team_codes():
 @click.option('-o', '--output-file', default=None,
               help="Save output to a file (only if csv or json option is provided).")
 def main(league, time, standings, extended, matchday, team, live, use12hour, players, output_format,
-         output_file, upcoming, lookup, listcodes, apikey):
+         output_file, upcoming, lookup, listcodes, listleagues, apikey):
     """
     A CLI for live and past football scores from various football leagues.
 
@@ -359,6 +367,10 @@ def main(league, time, standings, extended, matchday, team, live, use12hour, pla
 
         if listcodes:
             list_team_codes()
+            return
+        
+        if listleagues:
+            list_league_codes()
             return
 
         if live:

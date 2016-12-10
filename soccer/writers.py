@@ -197,6 +197,12 @@ class Stdout(BaseWriter):
                 self.league_header(league)
             self.scores(self.parse_result(data), add_new_line=not show_datetime)
             if show_datetime:
+                if data["odds"] is not None:
+                    odds = "{homeWin:<4} {draw:<4} {awayWin:<4}".format(**data["odds"])
+                    click.secho('   %s' % odds, nl=False, fg=self.colors.TIME)
+                else:
+                    empty = ""
+                    click.secho('%17s' % empty, nl=False)
                 click.secho('   %s' % Stdout.convert_utc_to_local_time(data["date"], 
                                         use_12_hour_format, show_datetime),
                                 fg=self.colors.TIME)
@@ -205,7 +211,7 @@ class Stdout(BaseWriter):
     def league_header(self, league):
         """Prints the league header"""
         league_name = " {0} ".format(league)
-        click.secho("{:=^62}".format(league_name), fg=self.colors.MISC)
+        click.secho("{:=^80}".format(league_name), fg=self.colors.MISC)
         click.echo()
 
     def scores(self, result, add_new_line=True):
@@ -217,11 +223,11 @@ class Stdout(BaseWriter):
         else:
             homeColor = awayColor = self.colors.TIE
 
-        click.secho('%-25s %2s' % (result.homeTeam, result.goalsHomeTeam),
+        click.secho('%-27s %4s' % (result.homeTeam, result.goalsHomeTeam),
                     fg=homeColor, nl=False)
         click.secho("  vs ", nl=False)
-        click.secho('%2s %s' % (result.goalsAwayTeam,
-                                result.awayTeam.rjust(25)), fg=awayColor,
+        click.secho('%-4s %s' % (result.goalsAwayTeam,
+                                result.awayTeam.rjust(27)), fg=awayColor,
                     nl=add_new_line)
 
     def parse_result(self, data):
