@@ -109,7 +109,7 @@ def get_live_scores(writer, use_12_hour_format):
             click.secho("No live action currently", fg="red", bold=True)
             return
         for game in scores["games"]:
-            if game['league'] in LEAGUE_KEYS: #evitar que pete si la key no existe
+            if game['league'] in LEAGUE_KEYS:
                 game['league'] = LEAGUE_KEYS[game['league']]
         writer.live_scores(scores, use_12_hour_format)
     else:
@@ -125,8 +125,6 @@ def get_live_league(writer, use_12_hour_format, league):
             click.secho("No live action currently", fg="red", bold=True)
             return
         filtered_scores = {}
-        #filtered_scores["games"] = [game for game in scores["games"] if game['league'] == LEAGUE_NAMES[league]]
-        
         filtered_scores["games"] = []
         for game in scores["games"]:
             if game['league'] == LEAGUE_NAMES[league]:
@@ -151,8 +149,10 @@ def get_team_scores(team, time, writer, show_upcoming, use_12_hour_format):
                         team_id=team_id, time_frame=time_frame, time=time))
             team_scores = req.json()
             if len(team_scores["fixtures"]) == 0:
-                click.secho("No action during past week. Change the time "
-                            "parameter to get more fixtures.", fg="red", bold=True)
+                word = 'next' if show_upcoming else 'past'
+                click.secho("No action during {word} {time} days. Change the time "
+                            "parameter to get more fixtures.".format(word=word, time=time),
+                            fg="red", bold=True)
             else:
                 writer.team_scores(team_scores, time, show_upcoming, use_12_hour_format)
         except APIErrorException as e:
@@ -217,9 +217,11 @@ def get_league_scores(league, time, writer, show_upcoming, use_12_hour_format):
             req = _get('competitions/{id}/fixtures?timeFrame={time_frame}{time}'.format(
                  id=league_id, time_frame=time_frame, time=str(time)))
             fixtures_results = req.json()
-            # no fixtures in the past week. display a help message and return
+            # no fixtures in the selected time frame. display a help message and return
             if len(fixtures_results["fixtures"]) == 0:
-                click.secho("No {league} matches in the past week.".format(league=league),
+                word = 'next' if show_upcoming else 'past'
+                click.secho("No {league} matches in the {word} {time} days."
+                            .format(league=league, word=word, time=time),
                             fg="red", bold=True)
                 return
             writer.league_scores(fixtures_results, time, show_upcoming, use_12_hour_format)
@@ -389,6 +391,9 @@ def main(league, time, standings, extended, matchday, team, live, use12hour, pla
             else:    
                 get_standings(league, writer, extended)
             return
+        
+        if time < 1:
+            raise IncorrectParametersException('Please specify a time value greater than 0.')
 
         if team:
             if lookup:

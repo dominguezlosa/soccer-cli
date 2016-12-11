@@ -8,13 +8,13 @@
     -- expulsados
     -- numero de tarjetas
 HECHO -- En --standings separar goles en marcados y recibidos
--- time=n personalizar error
+HECHO -- time=n personalizar error
 HECHO -- Añadir --extended a --standings para ver resultados según home y away
 HECHO -- Añadir victorias, derrotas, empates
 HECHO -- Crear comando --leagues para devolver todas las ligas disponibles junto con su código
 HECHO -- Filtrar por jornadas
 HECHO -- Arreglar problemas de espacios
-HECHO Añadir a league upcoming probabilidades
+HECHO -- Añadir a league upcoming probabilidades
 -- Probar a añadir --help a cada commando para ser mostrado
 
 Cómo refrescar el texto de consola:
