@@ -1,6 +1,6 @@
--- Aumentar la información por jugador
+HECHO -- Aumentar la información por jugador
 -- Aumentar la información por equipo
--- Actualizar el live cada X tiempo. Que X se pueda decidir via usuario
+HECHO -- Actualizar el live cada X tiempo. Que X se pueda decidir via usuario
 -- Dar información de un partido en concreto: /soccer get_match_data --team1="Real Madrid" --team2="Manchester United" --date=03/12/2016
     -- goles
     -- quien ha marcado los goles

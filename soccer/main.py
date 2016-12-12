@@ -3,6 +3,7 @@ import os
 import requests
 import sys
 import json
+import time
 
 from soccer import leagueids
 from soccer import leaguenameslive
@@ -100,7 +101,7 @@ def _get(url):
         raise APIErrorException('You have exceeded your allowed requests per minute/day')
 
 
-def get_live_scores(writer, use_12_hour_format):
+def get_live_scores(writer, use_12_hour_format, refresh):
     """Gets the live scores"""
     req = requests.get(LIVE_URL)
     if req.status_code == requests.codes.ok:
@@ -112,11 +113,20 @@ def get_live_scores(writer, use_12_hour_format):
             if game['league'] in LEAGUE_KEYS:
                 game['league'] = LEAGUE_KEYS[game['league']]
         writer.live_scores(scores, use_12_hour_format)
+        if refresh > 0:
+            click.echo()
+            click.secho("-------- Next refresh in ", fg="yellow", nl = False)
+            click.secho("{0} seconds".format(refresh), fg="white", bold = True, nl = False)
+            click.secho(" --------",fg="yellow");
+            click.echo()
+            click.echo()
+            time.sleep(refresh)
+            get_live_scores(writer, use_12_hour_format, refresh)
     else:
         click.secho("There was problem getting live scores", fg="red", bold=True)
         
         
-def get_live_league(writer, use_12_hour_format, league):
+def get_live_league(writer, use_12_hour_format, league, refresh):
     """Gets the live scores for a league"""
     req = requests.get(LIVE_LEAGUES_URL)
     if req.status_code == requests.codes.ok:
@@ -135,6 +145,15 @@ def get_live_league(writer, use_12_hour_format, league):
             click.secho("No live action currently for {league}.".format(league=league), fg="red", bold=True)
             return
         writer.live_scores(filtered_scores, use_12_hour_format)
+        if refresh > 0:
+            click.echo()
+            click.secho("-------- Next refresh in ", fg="yellow", nl = False)
+            click.secho("{0} seconds".format(refresh), fg="white", bold = True, nl = False)
+            click.secho(" --------",fg="yellow");
+            click.echo()
+            click.echo()
+            time.sleep(refresh)
+            get_live_league(writer, use_12_hour_format, league, refresh)
     else:
         click.secho("There was problem getting live scores", fg="red", bold=True)
 
@@ -296,6 +315,8 @@ def list_league_codes():
               help="Shows all the supported leagues.")
 @click.option('--live', is_flag=True,
               help="Shows live scores from various leagues.")
+@click.option('--refresh', default=-1,
+              help="Time in seconds for the live refresh.")
 @click.option('--use12hour', is_flag=True, default=False,
               help="Displays the time using 12 hour format instead of 24 (default).")
 @click.option('--standings', is_flag=True,
@@ -336,8 +357,8 @@ def list_league_codes():
               help='Output in JSON format.')
 @click.option('-o', '--output-file', default=None,
               help="Save output to a file (only if csv or json option is provided).")
-def main(league, time, standings, extended, matchday, team, live, use12hour, players, output_format,
-         output_file, upcoming, lookup, listcodes, listleagues, apikey):
+def main(league, time, standings, extended, matchday, team, live, refresh, use12hour,
+        players, output_format, output_file, upcoming, lookup, listcodes, listleagues, apikey):
     """
     A CLI for live and past football scores from various football leagues.
 
@@ -376,10 +397,10 @@ def main(league, time, standings, extended, matchday, team, live, use12hour, pla
             return
 
         if live:
-            if not league:
-                get_live_scores(writer, use12hour)
-                return
-            get_live_league(writer, use12hour, league)
+            if league:
+                get_live_league(writer, use12hour, league, refresh)
+            else:
+                get_live_scores(writer, use12hour, refresh)
             return
 
         if standings:

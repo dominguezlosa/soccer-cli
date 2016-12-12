@@ -108,11 +108,11 @@ class Stdout(BaseWriter):
     def team_players(self, team):
         """Prints the team players in a pretty format"""
         players = sorted(team['players'], key=lambda d: (d['jerseyNumber']))
-        click.secho("%-4s %-25s    %-20s    %-20s    %-15s    %-10s" %
+        click.secho("%-4s %-25s    %-20s    %-20s    %-15s    %-15s    %-12s" %
                     ("N.",  "NAME", "POSITION", "NATIONALITY", "BIRTHDAY",
-                     "MARKET VALUE"), bold=True, fg=self.colors.MISC)
+                     "MARKET VALUE", "CONTRACT UNTIL"), bold=True, fg=self.colors.MISC)
         fmt = (u"{jerseyNumber:<4} {name:<28} {position:<23} {nationality:<23}"
-               u" {dateOfBirth:<18} {marketValue}")
+               u" {dateOfBirth:<18} {marketValue:<18} {contractUntil}")
         for player in players:
             click.echo()
             click.secho(fmt.format(**player), bold=True)
